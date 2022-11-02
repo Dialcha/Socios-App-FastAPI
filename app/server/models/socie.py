@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field, constr, conint
+from pydantic import BaseModel, EmailStr, Field, constr, conint, create_model
 
 
 class SchemaDeSocie(BaseModel):
@@ -9,10 +9,10 @@ class SchemaDeSocie(BaseModel):
     dni: conint(strict=True) = Field(...)
     nro_socie: conint(strict=True, gt=0) = Field(...)
     email: EmailStr = Field(...)
-    telefono: constr(strict=True) = Field()
-    direccion: constr(strict=True) = Field()
-    codigo_postal: constr(strict=True) = Field()
-    tipo_socio: bool = Field()
+    telefono: constr(strict=True) = Field(None)
+    direccion: constr(strict=True) = Field(None)
+    codigo_postal: constr(strict=True) = Field(None)
+    tipo_socio: bool = Field(...)
 
     class config:
         schema_extra = {
@@ -29,6 +29,15 @@ class SchemaDeSocie(BaseModel):
             }
         }
 
+    @classmethod
+    def as_optional(cls):
+        annonations = cls.__fields__
+        fields = {
+            attribute: (Optional[data_type.type_], None)
+            for attribute, data_type in annonations.items()
+        }
+        OptionalModel = create_model(f"Optional{cls.__name__}", **fields)
+        return OptionalModel
 
 class UpdateSocieModel(BaseModel):
     nombre: Optional[constr(strict=True)]

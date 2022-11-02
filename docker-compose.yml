@@ -3,6 +3,7 @@ version: '3.8'
 services:
   api:
     build: ./app
+    tty: true
     volumes:
       - .:/code
     ports:
